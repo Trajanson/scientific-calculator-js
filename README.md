@@ -1,0 +1,1 @@
+iPhone 6 Screen Size: 1334-by-750-pixel

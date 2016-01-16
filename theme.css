@@ -1,0 +1,102 @@
+  #calculator {
+  
+    min-width: 625px;
+    max-width: 625px;
+    margin: 0 auto;
+    z-index: 100;
+    margin-top: 5%;	
+  	
+  	
+    border-radius: 10px;
+    box-shadow: 4px 4px 4px #888888;  
+    height: 412.5px;
+  }
+  
+  
+  #screen {
+    position: relative;
+    width: 100%;
+    height: 100px;  
+    color: white;
+    background: rgb(32, 32, 32);
+    text-align: right;
+    border-top: 1px solid;
+    border-left: -1px solid;
+    border-right: -1px solid;
+    border-radius: 5% 5% 0% 0%;
+    
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+    font-size: 2.35em;
+    font-weight: 100;
+    
+    overflow: hidden;  
+  
+  }
+  
+  #input-output {
+      color: white;
+      margin-right: 10px;
+      position: absolute;
+      bottom: 20px;
+      right: 10px;
+      text-align: inherit;
+      
+  }
+  
+  #number-0 {
+    width: 125px;
+  }
+  
+  .row>.entry-button {
+    display: table-cell;
+    text-align: center;
+  	vertical-align: middle;
+  	width: 62.5px;
+  	height: 62.5px;
+  }
+  
+  .entry-button{
+    cursor: pointer;
+    border-bottom: 1px solid black;
+    background-color: rgb(203,204,206);
+  }
+  
+  .entry-button:hover {
+    background-color: rgb(180,181,183);
+  }
+  
+  .white-buttons {
+    background-color: rgb(213,215,217);
+  }
+  
+  .white-buttons:hover {
+    background-color: rgb(185,187,189);
+  }
+  
+  .orange-operators {
+    background-color: rgb(248,146,20);
+  }
+  
+  .orange-operators:hover {
+    background-color: rgb(224,128,15);  
+  }
+  
+  
+  
+@media only screen and (max-width: 500px) {
+  .big-screen{
+  	width: 0px;
+  }
+
+  #calculator {
+    min-width: 250px;
+    max-width: 250px;
+  }  
+
+
+
+
+}
+
+
+  
