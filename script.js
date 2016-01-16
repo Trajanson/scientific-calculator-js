@@ -1,10 +1,20 @@
+// FACTORIAL GAMMA FUNCTION (FOR FRACTIONS)
+
 // ADD ENGAGE_SCIENTIFIC_NOTATION IF NUMBER IS TOO BIG
+// continuing to press equal should continue operations
+
 
 const SCREEN_BREAKPOINT = 500;
-
+const SMALL_SCREEN_SIZE = 9;
+const LARGE_SCREEN_SIZE = 16;
 
 function maxScreenLength(){ // DIGITS
-    return 9;
+    if(screenSizeSetting === "small-screen") {
+        return SMALL_SCREEN_SIZE;
+    } else if(screenSizeSetting === "big-screen"){
+        return LARGE_SCREEN_SIZE;
+    }
+    console.log("THERE HAS BEEN AN ERROR!");
 }
 
 function currentNumberLength(num){
@@ -40,7 +50,11 @@ var requestPlaced = false;
 
 var output = "";
 
-var screenSizeSetting = "big-screen"
+var screenSizeSetting = "big-screen";
+
+var radianMode = false;
+var secondSettingMode = false;
+var memoryRecallValue = 0;
 
 /// END SCREEN AREA
 
@@ -51,7 +65,7 @@ function prepareForOperations(operation){
         previouslyStoredInput = storedInput;
         storedInput = "0";
         requestedOperation = operation
-        printOutput();
+        printOutput(true);
     } else if ( requestPlaced === true ){
         requestedOperation = operation;
     }
@@ -61,7 +75,7 @@ function prepareForOperations(operation){
 function engageReset() {
     storedInput                 = "0";
     previouslyStoredInput       = "0";
-    requestPlaced = false;
+    requestPlaced = false;      // operation (+,-,/,*) hasbeen requested
     decimalExists = false;
     requestedOperation = "";
     allClear                    = "AC";
@@ -92,6 +106,17 @@ function turnNegative(a) {
     return -1 * a;
 }
 
+function factorial(a) {
+    if(a <= 1){ return 1;}
+    return a * factorial(a-1);
+}
+
+function customLog(a,b) {
+    return Math.log(a) / Math.log(b);   
+}
+
+
+
 function resetOperations() {
     requestPlaced = false;
     requestedOperation = "";
@@ -110,7 +135,22 @@ function engageOperationEngine(){
             break;
         case "/":
             storedInput = ( divide( Number(previouslyStoredInput), Number(storedInput) ) ).toString();
+            break;
+        case "EE":
+            storedInput = ( Number(previouslyStoredInput) * Math.pow(10, Number(storedInput) ) ).toString();
+            break;
+        case "customroot":
+            storedInput = (Math.pow(Number(previouslyStoredInput), 1/(Number(storedInput)) )).toString();
             break;              
+        case "customexp":
+            storedInput = (Math.pow(Number(previouslyStoredInput), (Number(storedInput)) )).toString();
+            break;
+        case "reverse-customexp":
+            storedInput = (Math.pow(Number(storedInput), (Number(previouslyStoredInput)) )).toString();
+            break;
+        case "custom-logarithm":
+            storedInput = (customLog(Number(previouslyStoredInput),Number(storedInput) )).toString();
+            break;            
     }
     resetOperations();
 }
@@ -194,38 +234,65 @@ function addCommas(input) {
 }
 
 
-function printOutput(){
-    if( Number.isInteger(Number(storedInput)) && decimalExists ){
-        output = storedInput.toString() + ".";
-    }
-    else {
-        output = storedInput;    
+function printOutput(operationPrint){
+    if(operationPrint){
+        output = previouslyStoredInput;
+    } else {
+        if( Number.isInteger(Number(storedInput)) && decimalExists ){
+            output = storedInput.toString() + ".";
+        }
+        else {
+            output = storedInput;    
+        }        
     }
     output = addCommas( removeExcessDigits(output) );
     $("#input-output").text(output);
 }
 
 
-function setSmallScreen(){
-    $(".big-screen").toggle();   
-}
-
-function setBigScreen(){
-    $(".big-screen").toggle();
-}
-
 function manageScreenSize(){
-    console.log($(window).width());
-    
     if( $(window).width() <= SCREEN_BREAKPOINT && screenSizeSetting == "big-screen" ){
         screenSizeSetting = "small-screen";
         $(".big-screen").toggle();
+        returnToFirstSetting();
     } else if ( $(window).width() > SCREEN_BREAKPOINT && screenSizeSetting == "small-screen" ) {
         screenSizeSetting = "big-screen";
         $(".big-screen").toggle();
-    console.log("this is hit");
     }
 }
+
+
+function returnToFirstSetting(){
+    $('#e-to-the-x-button').html("e<sup>x</sup>");      //  e^x     -   y^x
+    $('#ten-to-the-x-button').html("10<sup>x</sup>");   //  10^x    -   2^x
+    $('#log-base-e-button').html("ln");                 //  ln      -   log-base-y
+    $('#log-base-10-button').html("log<sub>10</sub>");  //  log10   -   log-base-2
+    $('#sin-button').html("sin");                       //  sin     -   sin^-1
+    $('#cos-button').html("cos");                       //  cos     -   cos^-1
+    $('#tan-button').html("tan");                       //  tan     -   tan^-1
+    $('#sinh-button').html("sinh");                     //  sinh    -   sinh^-1
+    $('#cosh-button').html("cosh");                     //  cosh    -   cosh^-1
+    $('#tanh-button').html("tanh");                     //  tanh    -   tanh^-1
+} 
+
+function returnToSecondSetting(){
+    $('#e-to-the-x-button').html("y<sup>x</sup>");       //  e^x     -   y^x
+    $('#ten-to-the-x-button').html("2<sup>x</sup>");     //  10^x    -   2^x
+    $('#log-base-e-button').html("log<sub>y</sub>");     //  ln      -   log-base-y
+    $('#log-base-10-button').html("log<sub>2</sub>");    //  log10   -   log-base-2
+    $('#sin-button').html("sin<sup>-1</sup>");           //  sin     -   sin^-1
+    $('#cos-button').html("cos<sup>-1</sup>");           //  cos     -   cos^-1
+    $('#tan-button').html("tan<sup>-1</sup>");           //  tan     -   tan^-1
+    $('#sinh-button').html("sinh<sup>-1</sup>");         //  sinh     -   sinh^-1
+    $('#cosh-button').html("cosh<sup>-1</sup>");         //  cosh     -   cosh^-1
+    $('#tanh-button').html("tanh<sup>-1</sup>");         //  tanh     -   tanh^-1    
+
+}
+
+
+
+
+
 
 
 $( document ).ready(function(){
@@ -476,5 +543,291 @@ $( document ).ready(function(){
             printOutput(); 
         }
     });    
+
+
+
+
+
+    $("#memory-clear").click(function(){
+        memoryRecallValue = 0;
+        printOutput();
+    });
+
+    $("#memory-add").click(function(){
+        memoryRecallValue += Number(storedInput);
+        printOutput();
+    });
+
+    $("#memory-subtract").click(function(){
+        memoryRecallValue -= Number(storedInput);
+        printOutput();
+    });
+
+    $("#memory-recall").click(function(){
+        storedInput = ( memoryRecallValue ).toString();
+        printOutput();
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $("#second-setting-button").click(function(){
+        if(secondSettingMode){
+            secondSettingMode = false;
+            returnToFirstSetting();
+        } else {
+            secondSettingMode = true;
+            returnToSecondSetting();
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    $("#second-power-button").click(function(){
+        storedInput = ( Math.pow(Number(storedInput),2 ) ).toString();
+        printOutput();
+    });
+
+    $("#third-power-button").click(function(){
+        storedInput = ( Math.pow(Number(storedInput),3 ) ).toString();
+        printOutput();
+    });
+
+    $("#x-to-the-y-button").click(function(){
+        prepareForOperations("customexp");
+    });
+
+    $("#e-to-the-x-button").click(function(){
+        if(secondSettingMode) { // y ^ x
+            prepareForOperations("reverse-customexp");
+        } else {
+            storedInput = ( Math.exp(Number(storedInput)) ).toString();
+            printOutput();
+        }
+    });
+
+    $("#ten-to-the-x-button").click(function(){
+        if(secondSettingMode) {
+            storedInput = ( Math.pow(2,Number(storedInput)) ).toString();
+            printOutput();            
+        } else {
+            storedInput = ( Math.pow(10,Number(storedInput)) ).toString();
+            printOutput();            
+        }
+
+    });
+
+    $("#inverse-button").click(function(){
+        storedInput = ( 1/(Number(storedInput)) ).toString();
+        printOutput();
+        setAllClear();
+    });
+
+
+    $("#square-root-button").click(function(){
+        storedInput = ( Math.pow(Number(storedInput), (1/2) ) ).toString();
+        printOutput();
+    });
+
+
+    $("#third-root-button").click(function(){
+        storedInput = ( Math.pow(Number(storedInput), (1/3) ) ).toString();
+        printOutput();
+    });
+
+
+
+    $("#custom-root-button").click(function(){
+        prepareForOperations("customroot");
+    });
+
+
+    $("#log-base-e-button").click(function(){
+        if(secondSettingMode) { // log x base y
+            prepareForOperations("custom-logarithm");
+        } else {
+            storedInput = ( Math.log( Number(storedInput) ) ).toString();
+            printOutput();            
+        }
+
+    });
+
+    $("#log-base-10-button").click(function(){
+        if(secondSettingMode) {
+            storedInput = ( Math.log( Number(storedInput) )/ Math.log(2) ).toString();
+            printOutput();            
+        } else {
+            storedInput = ( Math.log10( Number(storedInput) ) ).toString();
+            printOutput();            
+        }
+
+    });
+
+    $("#factorial-button").click(function(){
+        storedInput = ( factorial(Number(storedInput)) ).toString();
+        printOutput();
+    });
+
+
+    $("#sin-button").click(function(){
+        if(secondSettingMode) {
+            if(radianMode){
+                storedInput = (Math.asin(storedInput)).toString();            
+            } else {
+                storedInput = (Math.asin(storedInput) *180/ Math.PI ).toString();            
+            }
+            printOutput();            
+        } else {
+            if(radianMode){
+                storedInput = (Math.sin(storedInput)).toString();            
+            } else {
+                storedInput = (Math.sin(storedInput * Math.PI/180) ).toString();            
+            }
+            printOutput();            
+        }
+
+    });
+
+    $("#cos-button").click(function(){
+        if(secondSettingMode) {
+            if(radianMode){
+                storedInput = ( Math.acos(storedInput) ).toString();            
+            } else {
+                storedInput = (Math.acos(storedInput) * 180 / Math.PI ).toString();            
+            }
+            printOutput();            
+        } else {
+            if(radianMode){
+                storedInput = ( Math.cos(storedInput) ).toString();            
+            } else {
+                storedInput = (Math.cos(storedInput * Math.PI/180)).toString();            
+            }
+            printOutput();            
+        }
+
+    });
+
+    $("#tan-button").click(function(){
+        if(secondSettingMode) {
+            if(radianMode){
+                storedInput = (Math.atan(storedInput)).toString();            
+            } else {
+                storedInput = (Math.atan(storedInput) * 180/ Math.PI ).toString();
+            }
+            printOutput();            
+        } else {
+            if(radianMode){
+                storedInput = (Math.tan(storedInput)).toString();            
+            } else {
+                storedInput = (Math.tan(storedInput * Math.PI/180)).toString();
+            }
+            printOutput();            
+        }
+    });
+
+    $("#e-constant-button").click(function(){
+        storedInput = (Math.E).toString();
+        printOutput();
+    });
+
+    $("#ee-button").click(function(){
+        prepareForOperations("EE");
+    });
+    
+    $("#rad-button").click(function(){
+        if(radianMode){
+            radianMode = false;
+            $("#rad-display").text("");
+            $("#rad-button").text("Rad");
+        } else {
+            radianMode = true;
+            $("#rad-display").text("Rad");
+            $("#rad-button").text("Deg");
+        }
+    });
+
+    $("#sinh-button").click(function(){
+        if (secondSettingMode) {
+            storedInput = (Math.asinh(storedInput)).toString();
+            printOutput();            
+        } else {
+            storedInput = (Math.sinh(storedInput)).toString();
+            printOutput();            
+        }
+
+    });
+
+    $("#cosh-button").click(function(){
+        if(secondSettingMode) {
+            storedInput = (Math.acosh(storedInput)).toString();
+            printOutput();            
+        } else {
+            storedInput = (Math.cosh(storedInput)).toString();
+            printOutput();            
+        }
+    });
+
+    $("#tanh-button").click(function(){
+        if(secondSettingMode) {
+            storedInput = (Math.atanh(storedInput)).toString();
+            printOutput();            
+        } else {
+            storedInput = (Math.tanh(storedInput)).toString();
+            printOutput();            
+        }
+    });
+
+    $("#pi-button").click(function(){
+        storedInput = (Math.PI).toString();
+        setAllClear();
+        printOutput();
+    });
+
+
+    $("#random-button").click(function(){
+        storedInput = (Math.random()).toString();
+        setAllClear();
+        printOutput();
+    });
+
+
     
 });

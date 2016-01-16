@@ -14,16 +14,17 @@
     <div id="calculator">
     
         <div id="screen">
+            <div id="rad-display"></div>
             <div id="input-output">0</div>
         </div>
         
         <div class="row" id="row-1">
             <div class="entry-button big-screen big-screen-row-1">(</div>
             <div class="entry-button big-screen">)</div>
-            <div class="entry-button big-screen">mc</div>
-            <div class="entry-button big-screen">m+</div>
-            <div class="entry-button big-screen">m-</div>
-            <div class="entry-button big-screen">mr</div>
+            <div class="entry-button big-screen" id="memory-clear">mc</div>
+            <div class="entry-button big-screen" id="memory-add">m+</div>
+            <div class="entry-button big-screen" id="memory-subtract">m-</div>
+            <div class="entry-button big-screen" id="memory-recall">mr</div>
 
             <div class="entry-button" id="reset-button">AC</div>
             <div class="entry-button" id="make-negative-button">+/-</div>
@@ -32,12 +33,12 @@
         </div>
         
         <div class="row" id="row-2">
-            <div class="entry-button big-screen">2<sup>nd</sup></div>
-            <div class="entry-button big-screen">x<sup>2</sup></div>
-            <div class="entry-button big-screen">2<sup>3</sup></div>
-            <div class="entry-button big-screen">x<sup>y</sup></div>
-            <div class="entry-button big-screen">e<sup>x</sup></div>
-            <div class="entry-button big-screen">10<sup>x</sup></div>            
+            <div class="entry-button big-screen" id="second-setting-button">2<sup>nd</sup></div>
+            <div class="entry-button big-screen" id="second-power-button">x<sup>2</sup></div>
+            <div class="entry-button big-screen" id="third-power-button">x<sup>3</sup></div>
+            <div class="entry-button big-screen" id="x-to-the-y-button">x<sup>y</sup></div>
+            <div class="entry-button big-screen" id="e-to-the-x-button">e<sup>x</sup></div>
+            <div class="entry-button big-screen" id="ten-to-the-x-button">10<sup>x</sup></div>            
             
             <div class="entry-button white-buttons" id="number-7">7</div>
             <div class="entry-button white-buttons" id="number-8">8</div>
@@ -46,12 +47,12 @@
         </div>
         
         <div class="row" id="row-3">
-            <div class="entry-button big-screen">1/x</div>
-            <div class="entry-button big-screen">&radic;x</div>
-            <div class="entry-button big-screen">&#8731;x</div>
-            <div class="entry-button big-screen"><sup>y</sup>&radic;x</div>
-            <div class="entry-button big-screen">ln</div>
-            <div class="entry-button big-screen">log<sub>10</sub></div>
+            <div class="entry-button big-screen" id="inverse-button">1/x</div>
+            <div class="entry-button big-screen" id="square-root-button">&radic;x</div>
+            <div class="entry-button big-screen" id="third-root-button">&#8731;x</div>
+            <div class="entry-button big-screen" id="custom-root-button"><sup>y</sup>&radic;x</div>
+            <div class="entry-button big-screen" id="log-base-e-button">ln</div>
+            <div class="entry-button big-screen" id="log-base-10-button">log<sub>10</sub></div>
             
             <div class="entry-button white-buttons" id="number-4">4</div>
             <div class="entry-button white-buttons" id="number-5">5</div>
@@ -60,12 +61,12 @@
         </div>        
     
         <div class="row" id="row-4">
-            <div class="entry-button big-screen">x!</div>
-            <div class="entry-button big-screen">sin</div>
-            <div class="entry-button big-screen">cos</div>
-            <div class="entry-button big-screen">tan</div>
-            <div class="entry-button big-screen">e</div>
-            <div class="entry-button big-screen">EE</div>            
+            <div class="entry-button big-screen" id="factorial-button">x!</div>
+            <div class="entry-button big-screen" id="sin-button">sin</div>
+            <div class="entry-button big-screen" id="cos-button">cos</div>
+            <div class="entry-button big-screen" id="tan-button">tan</div>
+            <div class="entry-button big-screen" id="e-constant-button">e</div>
+            <div class="entry-button big-screen" id="ee-button">EE</div>            
             
             <div class="entry-button white-buttons" id="number-1">1</div>
             <div class="entry-button white-buttons" id="number-2">2</div>
@@ -74,12 +75,12 @@
         </div>
         
         <div class="row" id="row-5">
-            <div class="entry-button big-screen">Rad</div>
-            <div class="entry-button big-screen">sinh</div>
-            <div class="entry-button big-screen">cosh</div>
-            <div class="entry-button big-screen">tanh</div>
-            <div class="entry-button big-screen">&#120587;</div>
-            <div class="entry-button big-screen">Rand</div>            
+            <div class="entry-button big-screen" id="rad-button">Rad</div>
+            <div class="entry-button big-screen" id="sinh-button">sinh</div>
+            <div class="entry-button big-screen" id="cosh-button">cosh</div>
+            <div class="entry-button big-screen" id="tanh-button">tanh</div>
+            <div class="entry-button big-screen" id="pi-button">&#120587;</div>
+            <div class="entry-button big-screen" id="random-button">Rand</div>            
             
             <div class="entry-button white-buttons" id="number-0">0</div>
             <div class="entry-button white-buttons" id="decimal-point">.</div>
