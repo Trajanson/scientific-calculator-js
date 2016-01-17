@@ -44,21 +44,30 @@
   }
   
   #number-0 {
-    width: 125px;
+    width: 20%;
   }
   
   .row>.entry-button {
     display: table-cell;
+    border-collapse: collapse;    
     text-align: center;
   	vertical-align: middle;
   	width: 62.5px;
   	height: 62.5px;
+    overflow: hidden;
+    
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */    
   }
   
   .entry-button{
     cursor: pointer;
     border-bottom: 1px solid black;
     background-color: rgb(203,204,206);
+    border-left: 1px solid;    
+    padding: 0px;
+    width: 10%;
   }
   
   .entry-button:hover {
@@ -83,7 +92,7 @@
   
   
   
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 645px) {
   .big-screen{
   	width: 0px;
   }
@@ -93,6 +102,13 @@
     max-width: 250px;
   }  
 
+  .entry-button{
+    width: 25%;
+  }
+
+  #number-0 {
+    width: 50%;
+  }
 
 
 

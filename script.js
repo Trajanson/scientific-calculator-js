@@ -3,8 +3,10 @@
 // ADD ENGAGE_SCIENTIFIC_NOTATION IF NUMBER IS TOO BIG
 // continuing to press equal should continue operations
 
+// remove leading comma from negative numbers
 
-const SCREEN_BREAKPOINT = 500;
+
+const SCREEN_BREAKPOINT = 645;
 const SMALL_SCREEN_SIZE = 9;
 const LARGE_SCREEN_SIZE = 16;
 
@@ -56,6 +58,9 @@ var radianMode = false;
 var secondSettingMode = false;
 var memoryRecallValue = 0;
 
+var parenthesisMode = false;
+var parenthesisRecord = []; // [[origin value, requestedOperation]]
+
 /// END SCREEN AREA
 
 function prepareForOperations(operation){
@@ -79,6 +84,8 @@ function engageReset() {
     decimalExists = false;
     requestedOperation = "";
     allClear                    = "AC";
+    parenthesisMode = false;
+    parenthesisRecord = [];
     $("#reset-button").text("AC");
 }
 
@@ -119,7 +126,6 @@ function customLog(a,b) {
 
 function resetOperations() {
     requestPlaced = false;
-    requestedOperation = "";
 }
 
 function engageOperationEngine(){
@@ -150,7 +156,9 @@ function engageOperationEngine(){
             break;
         case "custom-logarithm":
             storedInput = (customLog(Number(previouslyStoredInput),Number(storedInput) )).toString();
-            break;            
+            break;           
+        default:
+            storedInput = storedInput;
     }
     resetOperations();
 }
@@ -198,8 +206,14 @@ function addCommas(input) {
     var decimalExists       = false,
         foundDecimal        = false,
         rightOfDecimalCount = 0,
+        numberIsNegative    = false,
         arr                 = input.toString().split(""),
         output              = [];
+
+    if(arr[0] === "-") {
+        arr.shift();
+        numberIsNegative = true;
+    }
         
     for(var i = 0; i < arr.length; i++) {
         if(arr[i] == "." ){
@@ -229,6 +243,9 @@ function addCommas(input) {
             rightOfDecimalCount++;
             output.unshift(arr[j]);
         }
+    }
+    if (numberIsNegative) {
+        output.unshift("-");
     }
     return output.join("");
 }
@@ -301,6 +318,7 @@ $( document ).ready(function(){
     manageScreenSize();
     
     $(window).resize( function(){
+        console.log($(window).width());
         manageScreenSize();
     });
     // End Manage Screensize //////////////////////////////////
@@ -433,7 +451,6 @@ $( document ).ready(function(){
     });
     
     $(document).keydown(function(event){
-        console.log(event.keyCode);
         if(event.keyCode === 46 ){
             engageReset();
             printOutput();          
@@ -449,7 +466,6 @@ $( document ).ready(function(){
     });
     
     $(document).keydown(function(event){
-        console.log(event.keyCode);
         if(event.keyCode === 110 ){
             if (currentNumberLength(storedInput) < maxScreenLength() ){
                 decimalExists = true;
@@ -460,68 +476,106 @@ $( document ).ready(function(){
     });        
 
     $("#calculate-button").click(function(){
-        engageOperationEngine()
+        engageOperationEngine();
+        requestPlaced = false;
         printOutput();
     });
     
     $(document).keydown(function(event){
-        console.log(event.keyCode);
         if(event.keyCode === 13 ){
-            engageOperationEngine()
+            engageOperationEngine();
+            requestPlaced = false;
             printOutput();       
         }
     });            
     
+    
     $("#add-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }
         prepareForOperations("+");
         setAllClear();
     });
     
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "+" ){
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }            
             prepareForOperations("+");
             setAllClear();            
         }
     });    
 
     $("#subtract-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }        
         prepareForOperations("-");
         setAllClear();
     });
 
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "-" ){
-        prepareForOperations("-");
-        setAllClear();     
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }                
+            prepareForOperations("-");
+            setAllClear();     
         }
     });
     
     $("#multiplication-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }        
         prepareForOperations("*");
         setAllClear();
     });
     
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "*" ){
-        prepareForOperations("*");
-        setAllClear();     
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }               
+            prepareForOperations("*");
+            setAllClear();     
         }
     });    
 
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "x" ){
-        prepareForOperations("*");
-        setAllClear();     
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }               
+            prepareForOperations("*");
+            setAllClear();     
         }
     });
 
     $("#division-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }                
         prepareForOperations("/");
         setAllClear();
     });
     
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "/" ){
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }                    
             prepareForOperations("/");
             setAllClear();     
         }
@@ -543,6 +597,41 @@ $( document ).ready(function(){
             printOutput(); 
         }
     });    
+
+
+
+
+
+
+
+
+
+
+    $("#set-parenthesis").click(function(){
+        if ( requestPlaced === true ){
+            parenthesisRecord.push([previouslyStoredInput, requestedOperation]);
+            previouslyStoredInput = "0";
+            requestPlaced = false;
+            decimalExists = false;
+            requestedOperation = "";
+            storedInput = "0";
+            printOutput();            
+        }
+    });
+
+    $("#close-parenthesis").click(function(){
+        console.log(parenthesisRecord);
+        if (parenthesisRecord.length > 0) {
+            engageOperationEngine();
+            var lastKnownDemand = parenthesisRecord.pop();
+            previouslyStoredInput = lastKnownDemand[0];
+            requestedOperation = lastKnownDemand[1];
+            engageOperationEngine();
+    
+            printOutput();
+        }
+    });
+
 
 
 
@@ -632,11 +721,19 @@ $( document ).ready(function(){
     });
 
     $("#x-to-the-y-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }               
         prepareForOperations("customexp");
     });
 
     $("#e-to-the-x-button").click(function(){
         if(secondSettingMode) { // y ^ x
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }               
             prepareForOperations("reverse-customexp");
         } else {
             storedInput = ( Math.exp(Number(storedInput)) ).toString();
@@ -676,12 +773,20 @@ $( document ).ready(function(){
 
 
     $("#custom-root-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }               
         prepareForOperations("customroot");
     });
 
 
     $("#log-base-e-button").click(function(){
         if(secondSettingMode) { // log x base y
+            if(requestPlaced === true ){
+                engageOperationEngine();
+                printOutput();
+            }               
             prepareForOperations("custom-logarithm");
         } else {
             storedInput = ( Math.log( Number(storedInput) ) ).toString();
@@ -769,6 +874,10 @@ $( document ).ready(function(){
     });
 
     $("#ee-button").click(function(){
+        if(requestPlaced === true ){
+            engageOperationEngine();
+            printOutput();
+        }               
         prepareForOperations("EE");
     });
     
