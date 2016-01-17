@@ -43,6 +43,13 @@
       
   }
   
+  #rad-display{
+      position: absolute;
+      margin-left: 10px;
+      bottom: 10px;
+      font-size: .5em;
+  }
+  
   #number-0 {
     width: 20%;
   }
@@ -90,6 +97,13 @@
     background-color: rgb(224,128,15);  
   }
   
+  #credits {
+     position: absolute;
+     bottom: 5%;
+     right: 3%;
+     width: 100%;
+     text-align: right;
+  }  
   
   
 @media only screen and (max-width: 645px) {
@@ -114,5 +128,8 @@
 
 }
 
+html {
+  overflow: hidden;
+}
 
   

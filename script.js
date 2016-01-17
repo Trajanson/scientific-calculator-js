@@ -272,6 +272,10 @@ function manageScreenSize(){
         screenSizeSetting = "small-screen";
         $(".big-screen").toggle();
         returnToFirstSetting();
+        radianMode = false;
+        $("#rad-display").text("");
+        $("#rad-button").text("Rad");        
+        
     } else if ( $(window).width() > SCREEN_BREAKPOINT && screenSizeSetting == "small-screen" ) {
         screenSizeSetting = "big-screen";
         $(".big-screen").toggle();
