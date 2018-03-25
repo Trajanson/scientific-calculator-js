@@ -5,10 +5,25 @@
 
 // remove leading comma from negative numbers
 
+import {
+    add,
+    subtract,
+    multiply,
+    divide,
+    turnNegative,
+    factorial,
+    customLog,
+} from "./operations";
 
-const SCREEN_BREAKPOINT = 645;
-const SMALL_SCREEN_SIZE = 9;
-const LARGE_SCREEN_SIZE = 16;
+import {
+    SCREEN_BREAKPOINT,
+    SMALL_SCREEN_SIZE,
+    LARGE_SCREEN_SIZE,
+} from "./config";
+
+import {
+    store
+} from "./store";
 
 function maxScreenLength(){ // DIGITS
     if(screenSizeSetting === "small-screen") {
@@ -92,37 +107,6 @@ function engageReset() {
 function setAllClear() {
     $("#reset-button").text("C");
 }
-
-function add(a, b) {
-    return a + b;
-}
-
-function subtract(a, b) {
-    return a - b;
-}
-
-function multiply(a, b) {
-    return a * b;
-}
-
-function divide(a, b) {
-    return a /b;
-}
-
-function turnNegative(a) {
-    return -1 * a;
-}
-
-function factorial(a) {
-    if(a <= 1){ return 1;}
-    return a * factorial(a-1);
-}
-
-function customLog(a,b) {
-    return Math.log(a) / Math.log(b);   
-}
-
-
 
 function resetOperations() {
     requestPlaced = false;
