@@ -316,7 +316,21 @@ function returnToSecondSetting(){
 
 
 
+const registerDigitButton = (
+    digit,
+) => {
+    $(`#number-${digit}`).click(() => {
+        engageCalculatorEngine(digit);
+        setAllClear();
+    });
 
+    $(document).keypress((event) => {
+        if (String.fromCharCode(event.keyCode) === `${digit}`) {
+            engageCalculatorEngine(digit);
+            setAllClear();
+        }
+    });
+};
 
 const registerOperationButton = (
     buttonName,
@@ -325,8 +339,65 @@ const registerOperationButton = (
     $(`#${buttonName}`).click(function () {
         handleClick();
         printOutput();
-    });    
+    });
 };
+
+const registerDigitButtons = () => {
+    Array(10)
+        .fill(0)
+        .map((value, index) => value + index)
+        .forEach(registerDigitButton);
+};
+registerDigitButtons();
+
+const registerPrimaryOperationButton = (
+    buttonName,
+    primaryOperationCharacter,
+    additionalOperationCharacters,
+) => {
+    $(`#${buttonName}`).click(() => {
+        if (requestPlaced) {
+            engageOperationEngine();
+            printOutput();
+        }
+        prepareForOperations(primaryOperationCharacter);
+        setAllClear();
+    });
+
+    [primaryOperationCharacter].concat(additionalOperationCharacters).forEach((operationCharacter) => {
+        $(document).keypress((event) => {
+            if (String.fromCharCode(event.keyCode) === operationCharacter) {
+                if (requestPlaced) {
+                    engageOperationEngine();
+                    printOutput();
+                }
+                prepareForOperations(primaryOperationCharacter);
+                setAllClear();
+            }
+        });
+    });
+};
+registerPrimaryOperationButton(
+    "add-button",
+    "+",
+    [],
+);
+registerPrimaryOperationButton(
+    "subtract-button",
+    "-",
+    [],
+);
+registerPrimaryOperationButton(
+    "multiplication-button",
+    "*",
+    ["x"],
+);
+registerPrimaryOperationButton(
+    "division-button",
+    "/",
+    [""],
+);
+
 
 registerOperationButton(
     "reset-button",
@@ -580,133 +651,7 @@ $( document ).ready(function(){
     });
     // End Manage Screensize //////////////////////////////////
 
-
-    
-    $("#number-0").click(function(){
-        engageCalculatorEngine(0);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "0" ){
-            engageCalculatorEngine(0);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-1").click(function(){
-        engageCalculatorEngine(1);
-        setAllClear();
-    });
-
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "1" ){
-            engageCalculatorEngine(1);
-            setAllClear();            
-        }
-    });
-    
-    $("#number-2").click(function(){
-        engageCalculatorEngine(2);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "2" ){
-            engageCalculatorEngine(2);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-3").click(function(){
-        engageCalculatorEngine(3);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "3" ){
-            engageCalculatorEngine(3);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-4").click(function(){
-        engageCalculatorEngine(4);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "4" ){
-            engageCalculatorEngine(4);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-5").click(function(){
-        engageCalculatorEngine(5);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "5" ){
-            engageCalculatorEngine(5);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-6").click(function(){
-        engageCalculatorEngine(6);
-        setAllClear();
-    });
-
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "6" ){
-            engageCalculatorEngine(6);
-            setAllClear();            
-        }
-    });
-
-    $("#number-7").click(function(){
-        engageCalculatorEngine(7);
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "7" ){
-            engageCalculatorEngine(7);
-            setAllClear();            
-        }
-    });    
-    
-    $("#number-8").click(function(){
-        engageCalculatorEngine(8);
-        setAllClear();
-    });    
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "8" ){
-            engageCalculatorEngine(8);
-            setAllClear();            
-        }
-    });    
-
-    $("#number-9").click(function(){
-        engageCalculatorEngine(9);
-        setAllClear();
-    });
-
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "9" ){
-            engageCalculatorEngine(9);
-            setAllClear();            
-        }
-    });
-    
-    $("#reset-button").click(function(){
-        engageReset();
-        printOutput();
-    });
-    
+      
     $(document).keydown(function(event){
         if(event.keyCode === 46 ){
             engageReset();
@@ -733,98 +678,7 @@ $( document ).ready(function(){
         }
     });            
     
-    
-    $("#add-button").click(function(){
-        if(requestPlaced === true ){
-            engageOperationEngine();
-            printOutput();
-        }
-        prepareForOperations("+");
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "+" ){
-            if(requestPlaced === true ){
-                engageOperationEngine();
-                printOutput();
-            }            
-            prepareForOperations("+");
-            setAllClear();            
-        }
-    });    
-
-    $("#subtract-button").click(function(){
-        if(requestPlaced === true ){
-            engageOperationEngine();
-            printOutput();
-        }        
-        prepareForOperations("-");
-        setAllClear();
-    });
-
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "-" ){
-            if(requestPlaced === true ){
-                engageOperationEngine();
-                printOutput();
-            }                
-            prepareForOperations("-");
-            setAllClear();     
-        }
-    });
-    
-    $("#multiplication-button").click(function(){
-        if(requestPlaced === true ){
-            engageOperationEngine();
-            printOutput();
-        }        
-        prepareForOperations("*");
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "*" ){
-            if(requestPlaced === true ){
-                engageOperationEngine();
-                printOutput();
-            }               
-            prepareForOperations("*");
-            setAllClear();     
-        }
-    });    
-
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "x" ){
-            if(requestPlaced === true ){
-                engageOperationEngine();
-                printOutput();
-            }               
-            prepareForOperations("*");
-            setAllClear();     
-        }
-    });
-
-    $("#division-button").click(function(){
-        if(requestPlaced === true ){
-            engageOperationEngine();
-            printOutput();
-        }                
-        prepareForOperations("/");
-        setAllClear();
-    });
-    
-    $(document).keypress(function(event){
-        if(String.fromCharCode(event.keyCode) === "/" ){
-            if(requestPlaced === true ){
-                engageOperationEngine();
-                printOutput();
-            }                    
-            prepareForOperations("/");
-            setAllClear();     
-        }
-    });    
-    
+        
         
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "%" ){
