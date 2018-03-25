@@ -58,8 +58,7 @@ function removeExcessDigits(inputString){
 // ALWAYS ADD TO RESET
 var storedInput             = "0",
     previouslyStoredInput   = "0",
-    requestedOperation      = "",
-    allClear                = "AC";
+    requestedOperation      = "";
 
 var decimalExists = false;
 
@@ -98,7 +97,6 @@ function engageReset() {
     requestPlaced = false;      // operation (+,-,/,*) hasbeen requested
     decimalExists = false;
     requestedOperation = "";
-    allClear                    = "AC";
     parenthesisMode = false;
     parenthesisRecord = [];
     $("#reset-button").text("AC");
