@@ -113,37 +113,55 @@ function resetOperations() {
 }
 
 function engageOperationEngine(){
+    const previouslyStoredInputNumber = parseInt(previouslyStoredInput, 10);
+    const storedInputNumber = parseInt(storedInput, 10);
+    let computedNumber;
+
     switch(requestedOperation) {
         case "+":
-            storedInput = ( add( Number(previouslyStoredInput), Number(storedInput) ) ).toString();
+            computedNumber = add(
+                previouslyStoredInputNumber,
+                storedInputNumber,
+            );
             break;
         case "-":
-            storedInput = ( subtract( Number(previouslyStoredInput), Number(storedInput) ) ).toString();
+            computedNumber = subtract(
+                previouslyStoredInputNumber,
+                storedInputNumber,
+            );
             break;
         case "*":
-            storedInput = ( multiply( Number(previouslyStoredInput), Number(storedInput) ) ).toString();
+            computedNumber = multiply(
+                previouslyStoredInputNumber,
+                storedInputNumber,
+            );
             break;
         case "/":
-            storedInput = ( divide( Number(previouslyStoredInput), Number(storedInput) ) ).toString();
+            computedNumber = divide(
+                previouslyStoredInputNumber,
+                storedInputNumber,
+            );
             break;
         case "EE":
-            storedInput = ( Number(previouslyStoredInput) * Math.pow(10, Number(storedInput) ) ).toString();
+            computedNumber = previouslyStoredInputNumber * Math.pow(10, storedInputNumber);
             break;
         case "customroot":
-            storedInput = (Math.pow(Number(previouslyStoredInput), 1/(Number(storedInput)) )).toString();
+            computedNumber = Math.pow(previouslyStoredInputNumber, 1 / storedInputNumber);
             break;              
         case "customexp":
-            storedInput = (Math.pow(Number(previouslyStoredInput), (Number(storedInput)) )).toString();
+            computedNumber = Math.pow(previouslyStoredInputNumber, storedInputNumber);
             break;
         case "reverse-customexp":
-            storedInput = (Math.pow(Number(storedInput), (Number(previouslyStoredInput)) )).toString();
+            computedNumber = Math.pow(storedInputNumber, previouslyStoredInputNumber);
             break;
         case "custom-logarithm":
-            storedInput = (customLog(Number(previouslyStoredInput),Number(storedInput) )).toString();
+            computedNumber = customLog(previouslyStoredInputNumber, storedInputNumber);
             break;           
         default:
-            storedInput = storedInput;
+            computedNumber = storedInputNumber;
     }
+
+    storedInput = computedNumber.toString();
     resetOperations();
 }
 
