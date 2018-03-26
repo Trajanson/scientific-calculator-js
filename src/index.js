@@ -46,6 +46,11 @@ var parenthesisRecord = []; // [[origin value, requestedOperation]]
 
 /// END SCREEN AREA
 
+const doesIncludeDecimal = (
+    characters,
+) => {
+    return characters.includes(".");
+}
 
 function maxScreenLength(){ // DIGITS
     if(screenSizeSetting === "small-screen") {
@@ -81,7 +86,6 @@ function prepareForOperations(operation){
 
     if( requestPlaced === false ){     // first time operator button gets pressed
         requestPlaced = true;
-        decimalExists = false;
 
         store.setPreviouslyStoredInput(storedInput);
         store.setStoredInput("0");
@@ -97,7 +101,6 @@ function prepareForOperations(operation){
 function engageReset() {
     store.reset();
     requestPlaced = false;      // operation (+,-,/,*) hasbeen requested
-    decimalExists = false;
     requestedOperation = "";
     parenthesisMode = false;
     parenthesisRecord = [];
@@ -172,107 +175,40 @@ function engageCalculatorEngine(input) {
 
     const storedInputAsNumber = parseInt(storedInput, 10);
     const isStoredInputAnInteger = Number.isInteger(storedInputAsNumber);
+    const doesStoredInputIncludeDecimal = doesIncludeDecimal(storedInput);
 
-    if (requestPlaced) {
-        /** if more digits can fit on screen */
-        if ( lengthOfStoredInput < maxScreenLength() ) {
-            if( isStoredInputAnInteger && !decimalExists ){
-                store.setStoredInput(
-                    ((storedInputAsNumber * 10) + input).toString()
-                );
-            } else if ( isStoredInputAnInteger && decimalExists ) {
-                store.setStoredInput(
-                    storedInput + "." + input.toString()
-                );
-            } else if ( decimalExists ) {
-                store.setStoredInput(
-                    storedInput + input.toString()
-                );
-            }
-        }   
-    } else {
-            /** if more digits can fit on screen */
-        if ( lengthOfStoredInput < maxScreenLength() ) {
-            if( isStoredInputAnInteger && !decimalExists ){
-                store.setStoredInput(
-                    ((storedInputAsNumber * 10) + input).toString()
-                );
-            } else if ( isStoredInputAnInteger && decimalExists ) {
-                store.setStoredInput(
-                    storedInput + "." + input.toString()
-                );
-            } else if ( decimalExists ) {
-                store.setStoredInput(
-                    storedInput + input.toString()
-                );
-            }
+    if (lengthOfStoredInput < maxScreenLength()) {
+        if (storedInput === "0") {
+            store.setStoredInput(
+                `${input}`
+            );            
+        } else {
+            store.setStoredInput(
+                `${storedInput}${input}`
+            );
         }
-    }
+    }   
+    
     printOutput();
 }
 
 
-function addCommas(input) {
-    var decimalExists       = false,
-        foundDecimal        = false,
-        rightOfDecimalCount = 0,
-        numberIsNegative    = false,
-        arr                 = input.toString().split(""),
-        output              = [];
-
-    if(arr[0] === "-") {
-        arr.shift();
-        numberIsNegative = true;
-    }
-        
-    for(var i = 0; i < arr.length; i++) {
-        if(arr[i] == "." ){
-            decimalExists = true;
-        }
-    }    
-    
-    for(var j = arr.length - 1; j >= 0; j--){
-        if(decimalExists){
-            if( foundDecimal ){
-                if( (rightOfDecimalCount % 3 === 0) && rightOfDecimalCount !== 0){
-                        output.unshift(",");
-                }
-                rightOfDecimalCount++;
-                output.unshift(arr[j]);
-            } else {
-                if(arr[j] == ".") {
-                    foundDecimal = true;
-                }
-                output.unshift(arr[j]);
-            }
-            
-        } else {
-            if( (rightOfDecimalCount % 3 === 0) && rightOfDecimalCount !== 0){
-                    output.unshift(",");
-            }
-            rightOfDecimalCount++;
-            output.unshift(arr[j]);
-        }
-    }
-    if (numberIsNegative) {
-        output.unshift("-");
-    }
-    return output.join("");
-}
+const addCommas = (
+    input,
+) => {
+    return new Intl.NumberFormat().format(input);
+};
 
 
 function printOutput(operationPrint){
     const storedInput = store.getStoredInput();
+    
+    const doesStoredInputIncludeDecimal = doesIncludeDecimal(storedInput);
 
     if(operationPrint){
         output = store.getPreviouslyStoredInput();
     } else {
-        if( Number.isInteger(Number(storedInput)) && decimalExists ){
-            output = storedInput.toString() + ".";
-        }
-        else {
-            output = storedInput;    
-        }        
+        output = storedInput;
     }
     output = addCommas( removeExcessDigits(output) );
     $("#input-output").text(output);
@@ -326,7 +262,18 @@ function returnToSecondSetting(){
 
 
 
+const handleRequestToInsertDecimalPoint = () => {
+    const storedInput = store.getStoredInput();
+    const doesStoredInputIncludeDecimal = doesIncludeDecimal(storedInput);
 
+    const spaceRemainsInDisplay = currentNumberLength(storedInput) < maxScreenLength();
+    if (spaceRemainsInDisplay && !doesStoredInputIncludeDecimal) {
+        store.setStoredInput(
+            `${storedInput}.`
+        );
+    }
+    setAllClear();
+};
 
 const registerDigitButton = (
     digit,
@@ -421,11 +368,7 @@ registerOperationButton(
 registerOperationButton(
     "decimal-point",
     () => {
-        const storedInput = store.getStoredInput();
-        if (currentNumberLength(storedInput) < maxScreenLength()) {
-            decimalExists = true;
-        }
-        setAllClear();
+        handleRequestToInsertDecimalPoint();
     },
 );
 
@@ -751,12 +694,7 @@ $( document ).ready(function(){
     
     $(document).keydown(function(event){
         if(event.keyCode === 110 ){
-            const storedInput = store.getStoredInput();
-
-            if (currentNumberLength(storedInput) < maxScreenLength() ){
-                decimalExists = true;
-            }
-            setAllClear();
+            handleRequestToInsertDecimalPoint();
             printOutput();       
         }
     });        
