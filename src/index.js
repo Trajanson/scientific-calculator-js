@@ -27,8 +27,7 @@ import {
 
 /// SCREEN AREA
 // ALWAYS ADD TO RESET
-var storedInputString = "0",
-    requestedOperation = "";
+var requestedOperation = "";
 
 var decimalExists = false;
 
@@ -453,7 +452,7 @@ registerOperationButton(
     () => {
         const storedInput = store.getStoredInput();
         store.setStoredInput(
-            (storedInputString / 100).toString()
+            (storedInput / 100).toString()
         );
     },
 );
@@ -484,7 +483,9 @@ registerOperationButton(
 registerOperationButton(
     "memory-recall",
     () => {
-        storedInputString = (memoryRecallValue).toString();
+        store.setStoredInput(
+            (memoryRecallValue).toString()
+        );
     },
 );
 
@@ -492,7 +493,9 @@ registerOperationButton(
     "second-power-button",
     () => {
         const storedInput = store.getStoredInput();
-        storedInputString = (Math.pow(Number(storedInput), 2)).toString();
+        store.setStoredInput(
+            (Math.pow(Number(storedInput), 2)).toString()
+        );
     },
 );
 
@@ -500,7 +503,9 @@ registerOperationButton(
     "third-power-button",
     () => {
         const storedInput = store.getStoredInput();
-        storedInputString = (Math.pow(Number(storedInput), 3)).toString();
+        store.setStoredInput(
+            (Math.pow(Number(storedInput), 3)).toString()
+        );
     },
 );
 
@@ -570,7 +575,7 @@ registerOperationButton(
         const storedInput = store.getStoredInput();
 
         store.setStoredInput(
-            (factorial(Number(storedInputString))).toString(),
+            (factorial(Number(storedInput))).toString(),
         );
     },
 );
@@ -583,14 +588,14 @@ registerOperationButton(
         if (secondSettingMode) {
             store.setStoredInput(
                 radianMode ?
-                    (Math.asin(storedInputString)).toString() :
-                    (Math.asin(storedInputString) * 180 / Math.PI).toString()
+                    (Math.asin(storedInput)).toString() :
+                    (Math.asin(storedInput) * 180 / Math.PI).toString()
             );
         } else {
             store.setStoredInput(
                 radianMode ?
-                    (Math.sin(storedInputString)).toString() :
-                    (Math.sin(storedInputString * Math.PI / 180)).toString()
+                    (Math.sin(storedInput)).toString() :
+                    (Math.sin(storedInput * Math.PI / 180)).toString()
             );            
         }
     },
@@ -599,17 +604,19 @@ registerOperationButton(
 registerOperationButton(
     "cos-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         if (secondSettingMode) {
             store.setStoredInput(
                 radianMode ?
-                    (Math.acos(storedInputString)).toString() :
-                    (Math.acos(storedInputString) * 180 / Math.PI).toString()
+                    (Math.acos(storedInput)).toString() :
+                    (Math.acos(storedInput) * 180 / Math.PI).toString()
             );
         } else {
             store.setStoredInput(
                 radianMode ?
-                    (Math.cos(storedInputString)).toString() :
-                    (Math.cos(storedInputString * Math.PI / 180)).toString()
+                    (Math.cos(storedInput)).toString() :
+                    (Math.cos(storedInput * Math.PI / 180)).toString()
             );            
         }
     },
@@ -618,17 +625,19 @@ registerOperationButton(
 registerOperationButton(
     "tan-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         if (secondSettingMode) {
             store.setStoredInput(
                 radianMode ?
-                    (Math.atan(storedInputString)).toString() :
-                    (Math.atan(storedInputString) * 180 / Math.PI).toString()
+                    (Math.atan(storedInput)).toString() :
+                    (Math.atan(storedInput) * 180 / Math.PI).toString()
             );
         } else {
             store.setStoredInput(
                 radianMode ?
-                    (Math.tan(storedInputString)).toString() :
-                    (Math.tan(storedInputString * Math.PI / 180)).toString()
+                    (Math.tan(storedInput)).toString() :
+                    (Math.tan(storedInput * Math.PI / 180)).toString()
             );
         }
     },
@@ -662,10 +671,12 @@ registerOperationButton(
 registerOperationButton(
     "sinh-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         store.setStoredInput(
             secondSettingMode ?
-                (Math.asinh(storedInputString)).toString() :
-                (Math.sinh(storedInputString)).toString()
+                (Math.asinh(storedInput)).toString() :
+                (Math.sinh(storedInput)).toString()
         );
     },
 );
@@ -673,10 +684,12 @@ registerOperationButton(
 registerOperationButton(
     "cosh-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         store.setStoredInput(
             secondSettingMode ?
-                (Math.acosh(storedInputString)).toString() :
-                (Math.cosh(storedInputString)).toString()
+                (Math.acosh(storedInput)).toString() :
+                (Math.cosh(storedInput)).toString()
         );
     },
 );
@@ -684,10 +697,12 @@ registerOperationButton(
 registerOperationButton(
     "tanh-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         store.setStoredInput(
             secondSettingMode ?
-                (Math.atanh(storedInputString)).toString() :
-                (Math.tanh(storedInputString)).toString()
+                (Math.atanh(storedInput)).toString() :
+                (Math.tanh(storedInput)).toString()
         );
     },
 );
@@ -736,7 +751,9 @@ $( document ).ready(function(){
     
     $(document).keydown(function(event){
         if(event.keyCode === 110 ){
-            if (currentNumberLength(storedInputString) < maxScreenLength() ){
+            const storedInput = store.getStoredInput();
+
+            if (currentNumberLength(storedInput) < maxScreenLength() ){
                 decimalExists = true;
             }
             setAllClear();
@@ -756,8 +773,10 @@ $( document ).ready(function(){
         
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "%" ){
+            const storedInput = store.getStoredInput();
+
             store.setStoredInput(
-                (storedInputString / 100).toString()
+                (storedInput / 100).toString()
             );
             printOutput(); 
         }
@@ -775,11 +794,10 @@ $( document ).ready(function(){
     $("#set-parenthesis").click(function(){
         if ( requestPlaced === true ){
             parenthesisRecord.push([store.getPreviouslyStoredInput(), requestedOperation]);
-            store.setPreviouslyStoredInput("0");
+            store.reset();
             requestPlaced = false;
             decimalExists = false;
             requestedOperation = "";
-            storedInputString = "0";
             printOutput();            
         }
     });
@@ -874,8 +892,10 @@ $( document ).ready(function(){
             }               
             prepareForOperations("reverse-customexp");
         } else {
+            const storedInput = store.getStoredInput();
+
             store.setStoredInput(
-                ( Math.exp(Number(storedInputString)) ).toString()
+                (Math.exp(Number(storedInput)) ).toString()
             );
             printOutput();
         }
@@ -907,8 +927,10 @@ $( document ).ready(function(){
             }               
             prepareForOperations("custom-logarithm");
         } else {
+            const storedInput = store.getStoredInput();
+
             store.setStoredInput(
-                ( Math.log( Number(storedInputString) ) ).toString()
+                (Math.log(Number(storedInput) ) ).toString()
             );
             printOutput();            
         }
