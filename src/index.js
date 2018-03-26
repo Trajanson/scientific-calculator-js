@@ -25,6 +25,29 @@ import {
     store
 } from "./store";
 
+/// SCREEN AREA
+// ALWAYS ADD TO RESET
+var storedInputString = "0",
+    requestedOperation = "";
+
+var decimalExists = false;
+
+var requestPlaced = false;
+
+var output = "";
+
+var screenSizeSetting = "big-screen";
+
+var radianMode = false;
+var secondSettingMode = false;
+var memoryRecallValue = 0;
+
+var parenthesisMode = false;
+var parenthesisRecord = []; // [[origin value, requestedOperation]]
+
+/// END SCREEN AREA
+
+
 function maxScreenLength(){ // DIGITS
     if(screenSizeSetting === "small-screen") {
         return SMALL_SCREEN_SIZE;
@@ -54,35 +77,16 @@ function removeExcessDigits(inputString){
 }
 
 
-/// SCREEN AREA
-// ALWAYS ADD TO RESET
-var storedInput             = "0",
-    previouslyStoredInput   = "0",
-    requestedOperation      = "";
-
-var decimalExists = false;
-
-var requestPlaced = false;
-
-var output = "";
-
-var screenSizeSetting = "big-screen";
-
-var radianMode = false;
-var secondSettingMode = false;
-var memoryRecallValue = 0;
-
-var parenthesisMode = false;
-var parenthesisRecord = []; // [[origin value, requestedOperation]]
-
-/// END SCREEN AREA
-
 function prepareForOperations(operation){
+    const storedInput = store.getStoredInput();
+
     if( requestPlaced === false ){     // first time operator button gets pressed
         requestPlaced = true;
         decimalExists = false;
-        previouslyStoredInput = storedInput;
-        storedInput = "0";
+
+        store.setPreviouslyStoredInput(storedInput);
+        store.setStoredInput("0");
+
         requestedOperation = operation
         printOutput(true);
     } else if ( requestPlaced === true ){
@@ -92,8 +96,7 @@ function prepareForOperations(operation){
 
 
 function engageReset() {
-    storedInput                 = "0";
-    previouslyStoredInput       = "0";
+    store.reset();
     requestPlaced = false;      // operation (+,-,/,*) hasbeen requested
     decimalExists = false;
     requestedOperation = "";
@@ -111,8 +114,8 @@ function resetOperations() {
 }
 
 function engageOperationEngine(){
-    const previouslyStoredInputNumber = parseInt(previouslyStoredInput, 10);
-    const storedInputNumber = parseInt(storedInput, 10);
+    const previouslyStoredInputNumber = parseInt(store.getPreviouslyStoredInput(), 10);
+    const storedInputNumber = parseInt(store.getStoredInput(), 10);
     let computedNumber;
 
     switch(requestedOperation) {
@@ -159,46 +162,54 @@ function engageOperationEngine(){
             computedNumber = storedInputNumber;
     }
 
-    storedInput = computedNumber.toString();
+    store.setStoredInput(computedNumber.toString());
     resetOperations();
 }
 
 
 function engageCalculatorEngine(input) {
+    const storedInput = store.getStoredInput();
+    const lengthOfStoredInput = currentNumberLength(storedInput);
 
-    if(requestPlaced === true){
-        if (currentNumberLength(storedInput) >= maxScreenLength() ){                      // if no more digits can fit on screen
-            storedInput = storedInput;
-        } else if ( currentNumberLength(storedInput) < maxScreenLength() ) {              // if more digits can fit on screen
-            if( Number.isInteger(Number(storedInput)) && !decimalExists ){
-                storedInput = ( (Number(storedInput) * 10) + input ).toString();
-            } else if ( Number.isInteger(Number(storedInput)) && decimalExists ) {
-                storedInput = storedInput + "." + input.toString();
+    const storedInputAsNumber = parseInt(storedInput, 10);
+    const isStoredInputAnInteger = Number.isInteger(storedInputAsNumber);
+
+    if (requestPlaced) {
+        /** if more digits can fit on screen */
+        if ( lengthOfStoredInput < maxScreenLength() ) {
+            if( isStoredInputAnInteger && !decimalExists ){
+                store.setStoredInput(
+                    ((storedInputAsNumber * 10) + input).toString()
+                );
+            } else if ( isStoredInputAnInteger && decimalExists ) {
+                store.setStoredInput(
+                    storedInput + "." + input.toString()
+                );
             } else if ( decimalExists ) {
-                storedInput += input.toString();
+                store.setStoredInput(
+                    storedInput + input.toString()
+                );
             }
         }   
-        printOutput();
-       
-       
-       
-        
-    } else if(requestPlaced === false){
-
-        if (currentNumberLength(storedInput) >= maxScreenLength() ){                      // if no more digits can fit on screen
-            storedInput = storedInput;
-        } else if ( currentNumberLength(storedInput) < maxScreenLength() ) {              // if more digits can fit on screen
-            if( Number.isInteger(Number(storedInput)) && !decimalExists ){
-                storedInput = ( (Number(storedInput) * 10) + input ).toString();
-            } else if ( Number.isInteger(Number(storedInput)) && decimalExists ) {
-                storedInput = storedInput + "." + input.toString();
+    } else {
+            /** if more digits can fit on screen */
+        if ( lengthOfStoredInput < maxScreenLength() ) {
+            if( isStoredInputAnInteger && !decimalExists ){
+                store.setStoredInput(
+                    ((storedInputAsNumber * 10) + input).toString()
+                );
+            } else if ( isStoredInputAnInteger && decimalExists ) {
+                store.setStoredInput(
+                    storedInput + "." + input.toString()
+                );
             } else if ( decimalExists ) {
-                storedInput += input.toString();
+                store.setStoredInput(
+                    storedInput + input.toString()
+                );
             }
         }
-
-        printOutput();
     }
+    printOutput();
 }
 
 
@@ -252,8 +263,10 @@ function addCommas(input) {
 
 
 function printOutput(operationPrint){
+    const storedInput = store.getStoredInput();
+
     if(operationPrint){
-        output = previouslyStoredInput;
+        output = store.getPreviouslyStoredInput();
     } else {
         if( Number.isInteger(Number(storedInput)) && decimalExists ){
             output = storedInput.toString() + ".";
@@ -409,6 +422,7 @@ registerOperationButton(
 registerOperationButton(
     "decimal-point",
     () => {
+        const storedInput = store.getStoredInput();
         if (currentNumberLength(storedInput) < maxScreenLength()) {
             decimalExists = true;
         }
@@ -427,14 +441,20 @@ registerOperationButton(
 registerOperationButton(
     "make-negative-button",
     () => {
-        storedInput = (-1 * storedInput).toString();
+        const storedInput = store.getStoredInput();
+        store.setStoredInput(
+            (-1 * storedInput).toString()
+        );
     },
 );
 
 registerOperationButton(
     "percent-button",
     () => {
-        storedInput = (storedInput / 100).toString();
+        const storedInput = store.getStoredInput();
+        store.setStoredInput(
+            (storedInputString / 100).toString()
+        );
     },
 );
 
@@ -448,6 +468,7 @@ registerOperationButton(
 registerOperationButton(
     "memory-add",
     () => {
+        const storedInput = store.getStoredInput();
         memoryRecallValue += Number(storedInput);
     },
 );
@@ -455,6 +476,7 @@ registerOperationButton(
 registerOperationButton(
     "memory-subtract",
     () => {
+        const storedInput = store.getStoredInput();
         memoryRecallValue -= Number(storedInput);
     },
 );
@@ -462,37 +484,47 @@ registerOperationButton(
 registerOperationButton(
     "memory-recall",
     () => {
-        storedInput = (memoryRecallValue).toString();
+        storedInputString = (memoryRecallValue).toString();
     },
 );
 
 registerOperationButton(
     "second-power-button",
     () => {
-        storedInput = (Math.pow(Number(storedInput), 2)).toString();
+        const storedInput = store.getStoredInput();
+        storedInputString = (Math.pow(Number(storedInput), 2)).toString();
     },
 );
 
 registerOperationButton(
     "third-power-button",
     () => {
-        storedInput = (Math.pow(Number(storedInput), 3)).toString();
+        const storedInput = store.getStoredInput();
+        storedInputString = (Math.pow(Number(storedInput), 3)).toString();
     },
 );
 
 registerOperationButton(
     "ten-to-the-x-button",
     () => {
-        storedInput = secondSettingMode ?
-            (Math.pow(2, Number(storedInput))).toString() :
-            (Math.pow(10, Number(storedInput))).toString();
+        const storedInput = store.getStoredInput();
+
+        store.setStoredInput(
+            secondSettingMode ?
+                (Math.pow(2, Number(storedInput))).toString() :
+                (Math.pow(10, Number(storedInput))).toString()
+        );
     },
 );
 
 registerOperationButton(
     "inverse-button",
     () => {
-        storedInput = (1 / (Number(storedInput))).toString();
+        const storedInput = store.getStoredInput();
+
+        store.setStoredInput(
+            (1 / (Number(storedInput))).toString()
+        );
         setAllClear();
     },
 );
@@ -500,44 +532,66 @@ registerOperationButton(
 registerOperationButton(
     "square-root-button",
     () => {
-        storedInput = (Math.pow(Number(storedInput), (1 / 2))).toString();
+        const storedInput = store.getStoredInput();
+
+        store.setStoredInput(
+            (Math.pow(Number(storedInput), (1 / 2))).toString(),
+        );
     },
 );
 
 registerOperationButton(
     "third-root-button",
     () => {
-        storedInput = (Math.pow(Number(storedInput), (1 / 3))).toString();
+        const storedInput = store.getStoredInput();
+        
+        store.setStoredInput(
+            (Math.pow(Number(storedInput), (1 / 3))).toString()
+        );
     },
 );
 
 registerOperationButton(
     "log-base-10-button",
     () => {
-        storedInput = secondSettingMode ?
-            (Math.log(Number(storedInput)) / Math.log(2)).toString() :
-            (Math.log10(Number(storedInput))).toString();
+        const storedInput = store.getStoredInput();
+
+        store.setStoredInput(
+            secondSettingMode ?
+                (Math.log(Number(storedInput)) / Math.log(2)).toString() :
+                (Math.log10(Number(storedInput))).toString()
+        );
     },
 );
 
 registerOperationButton(
     "factorial-button",
     () => {
-        storedInput = (factorial(Number(storedInput))).toString();
+        const storedInput = store.getStoredInput();
+
+        store.setStoredInput(
+            (factorial(Number(storedInputString))).toString(),
+        );
     },
 );
 
 registerOperationButton(
     "sin-button",
     () => {
+        const storedInput = store.getStoredInput();
+
         if (secondSettingMode) {
-            storedInput = radianMode ?
-                (Math.asin(storedInput)).toString() :
-                (Math.asin(storedInput) * 180 / Math.PI).toString();
+            store.setStoredInput(
+                radianMode ?
+                    (Math.asin(storedInputString)).toString() :
+                    (Math.asin(storedInputString) * 180 / Math.PI).toString()
+            );
         } else {
-            storedInput = radianMode ?
-                (Math.sin(storedInput)).toString() :
-                (Math.sin(storedInput * Math.PI / 180)).toString();
+            store.setStoredInput(
+                radianMode ?
+                    (Math.sin(storedInputString)).toString() :
+                    (Math.sin(storedInputString * Math.PI / 180)).toString()
+            );            
         }
     },
 );
@@ -546,13 +600,17 @@ registerOperationButton(
     "cos-button",
     () => {
         if (secondSettingMode) {
-            storedInput = radianMode ?
-                (Math.acos(storedInput)).toString() :
-                (Math.acos(storedInput) * 180 / Math.PI).toString();
+            store.setStoredInput(
+                radianMode ?
+                    (Math.acos(storedInputString)).toString() :
+                    (Math.acos(storedInputString) * 180 / Math.PI).toString()
+            );
         } else {
-            storedInput = radianMode ?
-                (Math.cos(storedInput)).toString() :
-                (Math.cos(storedInput * Math.PI / 180)).toString();
+            store.setStoredInput(
+                radianMode ?
+                    (Math.cos(storedInputString)).toString() :
+                    (Math.cos(storedInputString * Math.PI / 180)).toString()
+            );            
         }
     },
 );
@@ -561,13 +619,17 @@ registerOperationButton(
     "tan-button",
     () => {
         if (secondSettingMode) {
-            storedInput = radianMode ?
-                (Math.atan(storedInput)).toString() :
-                (Math.atan(storedInput) * 180 / Math.PI).toString();
+            store.setStoredInput(
+                radianMode ?
+                    (Math.atan(storedInputString)).toString() :
+                    (Math.atan(storedInputString) * 180 / Math.PI).toString()
+            );
         } else {
-            storedInput = radianMode ?
-                (Math.tan(storedInput)).toString() :
-                (Math.tan(storedInput * Math.PI / 180)).toString();            
+            store.setStoredInput(
+                radianMode ?
+                    (Math.tan(storedInputString)).toString() :
+                    (Math.tan(storedInputString * Math.PI / 180)).toString()
+            );
         }
     },
 );
@@ -575,7 +637,9 @@ registerOperationButton(
 registerOperationButton(
     "e-constant-button",
     () => {
-        storedInput = (Math.E).toString();
+        store.setStoredInput(
+            (Math.E).toString()
+        );
     },
 );
 
@@ -598,34 +662,42 @@ registerOperationButton(
 registerOperationButton(
     "sinh-button",
     () => {
-        storedInput = secondSettingMode ?
-            (Math.asinh(storedInput)).toString() :
-            (Math.sinh(storedInput)).toString();
+        store.setStoredInput(
+            secondSettingMode ?
+                (Math.asinh(storedInputString)).toString() :
+                (Math.sinh(storedInputString)).toString()
+        );
     },
 );
 
 registerOperationButton(
     "cosh-button",
     () => {
-        storedInput = secondSettingMode ?
-            (Math.acosh(storedInput)).toString() :
-            (Math.cosh(storedInput)).toString();
+        store.setStoredInput(
+            secondSettingMode ?
+                (Math.acosh(storedInputString)).toString() :
+                (Math.cosh(storedInputString)).toString()
+        );
     },
 );
 
 registerOperationButton(
     "tanh-button",
     () => {
-        storedInput = secondSettingMode ?
-            (Math.atanh(storedInput)).toString() :
-            (Math.tanh(storedInput)).toString();
+        store.setStoredInput(
+            secondSettingMode ?
+                (Math.atanh(storedInputString)).toString() :
+                (Math.tanh(storedInputString)).toString()
+        );
     },
 );
 
 registerOperationButton(
     "pi-button",
     () => {
-        storedInput = (Math.PI).toString();
+        store.setStoredInput(
+            (Math.PI).toString()
+        );
         setAllClear();
     },
 );
@@ -633,7 +705,9 @@ registerOperationButton(
 registerOperationButton(
     "random-button",
     () => {
-        storedInput = (Math.random()).toString();
+        store.setStoredInput(
+            (Math.random()).toString()
+        );
         setAllClear();
     },
 );
@@ -662,7 +736,7 @@ $( document ).ready(function(){
     
     $(document).keydown(function(event){
         if(event.keyCode === 110 ){
-            if (currentNumberLength(storedInput) < maxScreenLength() ){
+            if (currentNumberLength(storedInputString) < maxScreenLength() ){
                 decimalExists = true;
             }
             setAllClear();
@@ -682,7 +756,9 @@ $( document ).ready(function(){
         
     $(document).keypress(function(event){
         if(String.fromCharCode(event.keyCode) === "%" ){
-            storedInput = (storedInput / 100).toString();
+            store.setStoredInput(
+                (storedInputString / 100).toString()
+            );
             printOutput(); 
         }
     });    
@@ -698,12 +774,12 @@ $( document ).ready(function(){
 
     $("#set-parenthesis").click(function(){
         if ( requestPlaced === true ){
-            parenthesisRecord.push([previouslyStoredInput, requestedOperation]);
-            previouslyStoredInput = "0";
+            parenthesisRecord.push([store.getPreviouslyStoredInput(), requestedOperation]);
+            store.setPreviouslyStoredInput("0");
             requestPlaced = false;
             decimalExists = false;
             requestedOperation = "";
-            storedInput = "0";
+            storedInputString = "0";
             printOutput();            
         }
     });
@@ -713,7 +789,7 @@ $( document ).ready(function(){
         if (parenthesisRecord.length > 0) {
             engageOperationEngine();
             var lastKnownDemand = parenthesisRecord.pop();
-            previouslyStoredInput = lastKnownDemand[0];
+            store.setPreviouslyStoredInput(lastKnownDemand[0]);
             requestedOperation = lastKnownDemand[1];
             engageOperationEngine();
     
@@ -798,7 +874,9 @@ $( document ).ready(function(){
             }               
             prepareForOperations("reverse-customexp");
         } else {
-            storedInput = ( Math.exp(Number(storedInput)) ).toString();
+            store.setStoredInput(
+                ( Math.exp(Number(storedInputString)) ).toString()
+            );
             printOutput();
         }
     });
@@ -829,7 +907,9 @@ $( document ).ready(function(){
             }               
             prepareForOperations("custom-logarithm");
         } else {
-            storedInput = ( Math.log( Number(storedInput) ) ).toString();
+            store.setStoredInput(
+                ( Math.log( Number(storedInputString) ) ).toString()
+            );
             printOutput();            
         }
 
