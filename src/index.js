@@ -29,8 +29,6 @@ import {
 // ALWAYS ADD TO RESET
 var requestedOperation = "";
 
-var decimalExists = false;
-
 var requestPlaced = false;
 
 var output = "";
@@ -734,7 +732,6 @@ $( document ).ready(function(){
             parenthesisRecord.push([store.getPreviouslyStoredInput(), requestedOperation]);
             store.reset();
             requestPlaced = false;
-            decimalExists = false;
             requestedOperation = "";
             printOutput();            
         }
