@@ -688,7 +688,7 @@ $( document ).ready(function(){
 
       
     $(document).keydown(function(event){
-        if(event.keyCode === 46 ){
+        if(event.keyCode === 8 || event.keyCode === 46 ){
             engageReset();
             printOutput();          
         }
