@@ -194,16 +194,19 @@ function engageCalculatorEngine(input) {
 const addCommas = (
     input,
 ) => {
-    return new Intl.NumberFormat().format(input);
+    const formattedOutput = new Intl.NumberFormat().format(input);
+
+    if (input === "-0") {
+        return `-${formattedOutput}`;
+    }
+    return formattedOutput;
 };
 
 
 function printOutput(operationPrint){
     const storedInput = store.getStoredInput();
     
-    const doesStoredInputIncludeDecimal = doesIncludeDecimal(storedInput);
-
-    if(operationPrint){
+    if (operationPrint) {
         output = store.getPreviouslyStoredInput();
     } else {
         output = storedInput;
@@ -382,9 +385,11 @@ registerOperationButton(
     "make-negative-button",
     () => {
         const storedInput = store.getStoredInput();
-        store.setStoredInput(
-            (-1 * storedInput).toString()
-        );
+        let updatedStoredInput = storedInput[0] === "-" ?
+            storedInput.slice(1) :
+            `-${storedInput}`;
+
+        store.setStoredInput(updatedStoredInput);
     },
 );
 
